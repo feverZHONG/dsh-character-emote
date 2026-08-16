@@ -1,0 +1,7 @@
+﻿node_modules/
+*.log
+.patch-backups/
+.DS_Store
+
+# local assets (not tracked / not published)
+characters/

@@ -1,0 +1,32 @@
+{
+  "name": "dsh-character-emote-plugin",
+  "version": "0.6.0",
+  "description": "角色表情立绘插件：多角色 + 流式情绪自动判定（llm/stream 关键词规则，模型忘调工具也自动切图）+ 复合情绪 + 心情基线 + 立绘可拖动/滚轮缩放 + 立绘切换动画 + 情绪强度可视化 + 扩展触发条件 + 情绪模式（自动/手动/暂停）+ 无档位强度缩放模拟 + 立绘预加载，样式持久化到 Host（跨重启恢复）。",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": { "default": "./index.js" },
+    "./client": { "default": "./client.js" },
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": ["index.js", "client.js", "cordis.patch.yml", "README.md"],
+  "license": "MIT",
+  "dsh": {
+    "bundle": { "patch": "./cordis.patch.yml" },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-runtime"
+      ],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@deepseek-ai/dsh-host-webserver": "0.1.0-rc.5",
+    "@deepseek-ai/dsh-tools": "0.1.0-rc.5",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.0-rc.5",
+    "@deepseek-ai/dsh-client-runtime": "0.1.0-rc.5"
+  }
+}

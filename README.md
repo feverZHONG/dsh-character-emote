@@ -1,0 +1,116 @@
+# dsh-character-emote-plugin · 角色表情立绘插件
+
+对话右侧固定浮层实时显示**当前角色**的表情立绘：模型回复时调用 `set_expression` 工具声明情绪，
+Host 更新状态，Client 每 2 秒轮询切图；设置 → **角色立绘** 小节一键切换角色、一键刷新。
+
+## v0.6.0 新功能（2026-08-17）
+
+### 情绪模式：自动 / 手动 / 暂停
+- **自动**：模型调用 `set_expression` 或流式判定直接切图（默认）
+- **手动**：模型只记录「待定情绪」不切图；设置页显示待定卡片 + 情绪选择器，点「应用」或点选情绪才切图
+- **暂停**：完全冻结，任何情绪变化都不生效
+- 设置 → 角色立绘 → **情绪模式** 三个按钮切换
+
+### 无档位强度缩放模拟
+- 情绪只有基础图（如 `joy.png`）没有变体档时，请求高强度立绘不再「原地不动」——
+  Host 返回 `visualIntensity`(0..1)，浮层用 scale 放大模拟视觉强度；有变体图时照旧走档位图（向后兼容）
+
+### 立绘预加载 + 轮询重构
+- 切换角色后预加载该角色全部立绘，弱网切图不闪
+- 轮询只建一次 interval（ref 比较），过渡动画不再被轮询打断
+- 浮层仅图片本体可拖动/滚轮缩放，不挡下方 UI 交互
+
+### 新路由
+| 路由 | 说明 |
+|:-----|:-----|
+| `POST /character-emote/mode` | body `{mode: auto\|manual\|paused}`，切换情绪模式 |
+| `POST /character-emote/apply` | body `{emotion, intensity?, secondary?}`，手动应用情绪（设置页用） |
+
+## v0.5.0 新功能
+
+### 立绘切换动画
+- **淡入淡出过渡**：立绘切换时先淡出再淡入，避免生硬跳切
+- **缩放动画**：切换时立绘先缩小再放大，视觉更流畅
+- **动画开关**：可在设置页控制动画效果
+
+### 情绪强度可视化
+- **强度指示条**：在立绘下方显示情绪强度等级
+- **直观反馈**：用户可直观看到当前情绪强度
+- **支持多档**：最大支持3档强度显示
+
+### 扩展触发条件
+- **标点符号触发**：！→ 兴奋，？→ 困惑，...→ 悲伤
+- **表情符号触发**：😊→ 开心，😠→ 生气，😢→ 难过，😲→ 惊讶
+- **语气词触发**：哇/啊→ 惊讶，哎/唉→ 失望，嘿/嘻嘻→ 好笑
+
+### 动态强度映射
+- **心情影响强度**：情绪强度根据当前心情动态调整
+- **自然过渡**：心情好时正面情绪增强，负面情绪减弱
+- **平衡效果**：心情差时正面情绪减弱，负面情绪增强
+
+## 多角色：图放哪（核心）
+
+支持多个角色，**一个角色一个目录，目录名就是角色名**：
+
+```
+dsh-character-emote/
+  characters/
+    高奈利亚/                 ← 角色：高奈利亚（目录名 = 角色 id，中文也行）
+      joy.png
+      anger.png  anger-1.png  anger-2.png  anger-3.png
+      ...
+    角色B/                    ← 再建一个目录就是新角色
+      ...
+```
+
+命名规律（与角色无关，每个角色目录内部都一样）：
+
+| 文件 | 含义 |
+|:-----|:-----|
+| `joy.png` | 情绪 joy 的基础档（intensity 0） |
+| `anger-1.png` / `anger-2.png` / `anger-3.png` | 情绪 anger 的强度递进档（intensity 1/2/3） |
+
+支持 png/jpg/jpeg/webp/gif。**没有任何立绘时插件是空态**（不显示任何默认角色）；
+图放好后在设置页点「🔃 刷新角色」即识别，**不用重启**。
+
+## 安装 / 打包
+
+```powershell
+# 安装（装完重启 WebUI 生效）
+node "E:\DeepSeek Harness\resources\host\node_modules\@deepseek-ai\dsh\lib\bin.js" plugin --profile web add E:\DCIM\DSH-Liya\workspace\dsh-plugins\dsh-character-emote
+
+# 打包归档（产物在 workspace\dsh-plugins\dist\）
+pnpm pack --pack-destination E:\DCIM\DSH-Liya\workspace\dsh-plugins\dist
+
+# 卸载
+node "...bin.js" plugin --profile web remove dsh-character-emote-plugin
+```
+
+## 界面行为
+
+- **右侧浮层**：当前角色立绘固定对话右侧（`shell.overlay` 穿透层），圆角投影，`角色 · 主情绪 + 副情绪` 标签贴图下；浮层 `pointer-events: none` 不挡点按，**仅图片本体可拖动/滚轮缩放**；模型报情绪后最多 2 秒切图（手动/暂停模式下按模式规则处理）
+- **设置 → 角色立绘**：角色列表点选即切换；「🔃 刷新角色」重新扫描 `characters/`（丢图/加角色后点一下即可，无需重启）；空态时显示提示
+- **立绘样式可调**（设置页）：大小滑条（120–420px）、左/右位置、透明度（30–100%）、切换动画开关；localStorage 持久化，改完浮层即时跟随
+
+## 情绪与心情（v0.3）
+
+- **复合情绪**：`set_expression` 支持 `secondary` 副情绪（如 `surprise` 主 + `embarrassment` 副 = 又惊又羞），标签与工具结果都显示 `主 + 副`
+- **心情基线 mood**：28 种情绪内置 valence（正负）/ arousal（唤醒度）轴，每次情绪调用按比例混入 mood，随时间指数衰减（半衰期 2 分钟）；设置页显示心情圆点与数值
+- **跳变缓冲**：新情绪与当前心情方向相反且差距大时（如刚在生气立刻要开心），强度自动降一档，避免表情硬切
+- 心情为内存态，重启归零
+
+## 原理
+
+- Host 半（`index.js`）：`import.meta.url` 定位插件目录 → `characters/*` 扫描角色表（空则回退 `emotes/`，id `default`）；
+  `webServer` 注册 `/character-emote/characters|character|refresh|state|file/<name>` 路由（basename + 白名单防路径穿越）；
+  `tools.register` 注册 `set_expression` 工具，情绪枚举 = 全角色并集，execute 按当前角色校验；
+  **refresh 时重扫角色表并重注册工具**（枚举跟着变）
+- Client 半（`client.js`）：`slots` 注册 `shell.overlay` 浮层 + `settings.section` 设置页，
+  `fetch('/character-emote/state')` 轮询，`<img>` 走相对路径加载
+- 状态为内存态（重启回默认角色 + neutral 情绪）；如需跨重启记住角色，后续可在 Host 加 `$DSH_HOME` 持久化
+
+## 已知边界
+
+- 角色/情绪切换后 `set_expression` 工具枚举是刷新时的并集快照：刷新会重注册，但重注册后需下一次模型调用才看到新枚举
+- 工具注册失败不影响图片路由（已 catch），但模型就不会主动报情绪了
+- 多会话共用同一份当前角色/情绪（全局单例）
