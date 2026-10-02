@@ -76,15 +76,19 @@ dsh-character-emote/
 ## 安装 / 打包
 
 ```powershell
-# 安装（装完重启 WebUI 生效）
-node "E:\DeepSeek Harness\resources\host\node_modules\@deepseek-ai\dsh\lib\bin.js" plugin --profile web add E:\DCIM\DSH-Liya\workspace\dsh-plugins\dsh-character-emote
+# 安装（<dsh> 请替换为你安装的 DSH CLI 调用方式；装完重启才生效）
+<dsh> plugin --profile <profile> add <本插件目录>
 
-# 打包归档（产物在 workspace\dsh-plugins\dist\）
-pnpm pack --pack-destination E:\DCIM\DSH-Liya\workspace\dsh-plugins\dist
+# 打包归档（npm 标准 tarball，可分发）
+pnpm pack --pack-destination <产物目录>
 
 # 卸载
-node "...bin.js" plugin --profile web remove dsh-character-emote-plugin
+<dsh> plugin --profile <profile> remove dsh-character-emote-plugin
 ```
+
+> **立绘素材自备**：仓库不含任何立绘图片（`characters/` 下的图不进版本库）。
+> 按上面的目录规则把自己的图放进去即可。
+
 
 ## 界面行为
 
