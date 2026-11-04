@@ -1,3 +1,13 @@
+# ⚠️ 本仓库已归档 · 停止维护 · 请勿使用
+
+> 该插件只适配 DSH `0.2.0-rc.2`；2026-10-17 桌面版升级到 `0.2.1-rc.2` 后已无法加载，本地 DSH profile 中也已移除。
+> **本仓库于 2026-11-04 归档（GitHub 只读）**：不再更新、不再修复、不再发布。
+>
+> 现役、仍在维护的莉娅 DSH 插件只有三个：
+> [dsh-liya-skin](https://github.com/feverZHONG/dsh-liya-skin) · [dsh-puzzle](https://github.com/feverZHONG/dsh-puzzle) · [dsh-chess-xq](https://github.com/feverZHONG/dsh-chess-xq)
+
+---
+
 # dsh-character-emote-plugin · 角色表情立绘插件
 
 对话右侧固定浮层实时显示**当前角色**的表情立绘：模型回复时调用 `set_expression` 工具声明情绪，
