@@ -2,11 +2,6 @@
 
 > 该插件只适配 DSH `0.2.0-rc.2`；2026-10-17 桌面版升级到 `0.2.1-rc.2` 后已无法加载，本地 DSH profile 中也已移除。
 > **本仓库于 2026-11-04 归档（GitHub 只读）**：不再更新、不再修复、不再发布。
->
-> 现役、仍在维护的莉娅 DSH 插件只有两个：
-> [dsh-puzzle](https://github.com/feverZHONG/dsh-puzzle) · [dsh-chess-xq](https://github.com/feverZHONG/dsh-chess-xq)
->
-> （`dsh-liya-skin` 壁纸插件也已在 2026-11-04 一并归档。）
 
 ---
 
